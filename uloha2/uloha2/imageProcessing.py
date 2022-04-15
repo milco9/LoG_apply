@@ -8,6 +8,7 @@ from cv2 import rectangle
 import matplotlib.pyplot as plt
 from IPython.display import display, clear_output
 import appGUI
+import math as m
 
 from tkinter import *
 from tkinter import ttk, filedialog
@@ -35,8 +36,7 @@ class ImgProc():
             self.filepathExist =TRUE
      
             
-
-    def con(self,inputImage,inputFilter):
+    def conLap(self,inputImage,inputFilter):
         imageHeight = inputImage.shape[0]
         imageWidth = inputImage.shape[1]
         filterShapeZero = inputFilter.shape[0]
@@ -62,24 +62,82 @@ class ImgProc():
         img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         return img
 
-    def GAUSS(self,img,maskMatrixOn2,maskMatrixTOn2,sigmaOn2):
-            arg = -(maskMatrixOn2 + maskMatrixTOn2)/(2*sigmaOn2)
 
-            h=numpy.exp(arg)
+    def calculateH(self,maskMatrixOn2,maskMatrixTOn2,sigma):
+        pi=numpy.pi
+        sigmaOn2=sigma**2
 
-            newImage = self.con(img,h)
-            gImage = newImage/numpy.max(newImage)
-            return gImage,h
+        h=numpy.exp(-(maskMatrixOn2 + maskMatrixTOn2)/(2*sigmaOn2))
 
-    def LAPLACIAN(self,img,h,size):
+        h=h*(maskMatrixOn2 +maskMatrixTOn2-2*sigmaOn2)/(2*pi*sigma**6)
+
+        return h
+
+    def LAPLACIAN(self,img,maskMatrixOn2,maskMatrixTOn2):
+
+            _,size,sigma =self.variables()
+
+            h=self.calculateH(maskMatrixOn2,maskMatrixTOn2,sigma)
 
             laplacian=h-numpy.sum(h)/(size**2)
 
-            laplacian = self.con(img,laplacian)
+            laplacian = self.conLap(img,laplacian)
             laplacian= laplacian/numpy.max(laplacian)
 
             return laplacian
-            
+
+    def GAUSS(self,img):
+
+        B,G,R = cv2.split(img)
+        img_GB = self.applyFilter(B)
+        img_GG = self.applyFilter(G)
+        img_GR = self.applyFilter(R)
+        img = cv2.merge([img_GB,img_GG,img_GR])
+
+        return img
+
+    def createKernelGauss(self):
+
+        k,size,sigma =self.variables()
+
+        pi=numpy.pi
+        ker = numpy.zeros((size,size),numpy.float32)
+        for i in range (size):
+            for j in range (size):
+                n = -((i-k)**2 + (j-k)**2)
+                ker[i,j] = m.exp(n/(2*(sigma**2)))/2*pi*(sigma**2)
+        ker= ker/(numpy.sum(ker)) 
+        return ker
+
+    def applyFilter(self,img_gray):
+
+        k,_,_ =self.variables()
+
+        kernel = self.createKernelGauss()
+
+        height,width = img_gray.shape
+        kernel_height,_ = kernel.shape
+        
+        halfKernelHeight = (int(kernel_height/2))
+
+        rowRange =(halfKernelHeight,height-halfKernelHeight)
+        colRange =(halfKernelHeight,width-halfKernelHeight)
+
+        for i in range(rowRange[1]):
+            for j in range(colRange[1]):
+                sum = 0
+                for k in range(0,kernel_height):
+                    for r in range(0,kernel_height):
+                        sum += img_gray[i-halfKernelHeight+k,j-halfKernelHeight+r]*kernel[k,r]
+                img_gray[i,j] = sum
+        return img_gray
+
+    def variables(self):  
+        k=1
+        size = 2*k+1
+        sigma =0.9     
+
+        return k,size,sigma  
 
     def imgConvert(self):
         GUI = appGUI.App()
@@ -88,19 +146,13 @@ class ImgProc():
         print(str(self.filepath))
         if self.filepathExist is TRUE:
             
-            self.filepathExist = False
-            GUI.path=False
 
-            size =3
-            sigma =0.9
-            sigmaOn2 =sigma**2
-            pi=numpy.pi
 
+         
+            _,size,sigma =self.variables()
 
             image = cv2.imread(self.filepath)
-
-            img=self.preprocessIMG(image)
-
+            image_grey=self.preprocessIMG(image)
 
 
             v = numpy.array(range(-int(numpy.floor(size/2)), int(numpy.ceil(size/2))))
@@ -112,16 +164,23 @@ class ImgProc():
             maskMatrixTOn2=maskMatrixT**2
 
             ## Gaussian
+            print("gauss")
 
-            gImage,h=self.GAUSS(img,maskMatrixOn2,maskMatrixTOn2,sigmaOn2)
+            gImage=self.GAUSS(image)
+            gImage=self.preprocessIMG(gImage)
 
             ## laplacian
-            h=h*(maskMatrixOn2 +maskMatrixTOn2-2*sigmaOn2)/(2*pi*sigma**6)
-            lImage=self.LAPLACIAN(gImage,h,size)
-            
+            print("lap")
+            lImage=self.LAPLACIAN(gImage,maskMatrixOn2,maskMatrixTOn2)
+
+            lImageOrig=self.LAPLACIAN(image_grey,maskMatrixOn2,maskMatrixTOn2)
+            print("end")
             
 
-            
+            cv2.imshow("Loaded Image",image)
+            cv2.imshow("Gauss",gImage)
+            cv2.imshow("Laplacian",lImageOrig)
+
             cv2.imshow("LoG",lImage)
 
             #self.functionLoG(imageGrey,size,sigma)

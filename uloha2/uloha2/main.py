@@ -13,10 +13,13 @@ if __name__ == "__main__":
 
 
     while True:
+        
         if GUI.path:
             imageProcess.buttonSetPathClicked()
+            GUI.path=False
         if imageProcess.filepathExist:   
             GUI.picture.configure(image=imageProcess.imgConvert())
+            imageProcess.filepathExist=False
         GUI.update()
         if 0xFF == ord('q'):
             break
