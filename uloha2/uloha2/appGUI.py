@@ -3,8 +3,7 @@ import tkinter
 from tkinter import *
 from tkinter import ttk, filedialog
 from tkinter.filedialog import askopenfile
-import imageProcessing
-import os
+
 
 class App(tkinter.Tk):
     def __init__(self):
@@ -13,11 +12,20 @@ class App(tkinter.Tk):
         self.title(" Uloha2")
         self.path=FALSE
         self.createWigets()
+        self.loadTESTimageFlag = FALSE
+        self.imageIsprocesed=FALSE
+        self.LoadedTestImage=FALSE
         
 
 
     def buttonTrackingClicked(self):
         self.path=True
+
+    def buttonLoadTestImage(self):
+        self.loadTESTimageFlag=True
+
+    def buttonLoadedTestImage(self):
+        self.LoadedTestImage=True
 
 
 
@@ -25,8 +33,15 @@ class App(tkinter.Tk):
         shift = 35
         style = ttk.Style()
 
-        self.buttonDeleteTrackers = ttk.Button(self, text = "Load image", command = self.buttonTrackingClicked)
-        self.buttonDeleteTrackers.place(x=680,y=21)
+        self.buttonLoadImage = ttk.Button(self, text = "Load image", command = self.buttonTrackingClicked)
+        self.buttonLoadImage.place(x=680,y=21)
+
+        self.buttonLoadImage = ttk.Button(self, text = "TEST image", command = self.buttonLoadTestImage)
+        self.buttonLoadImage.place(x=680,y=81)
+
+        
+        self.buttonLoadImage = ttk.Button(self, text = "Loaded image", command = self.buttonLoadedTestImage)
+        self.buttonLoadImage.place(x=680,y=141)
 
         self.picture = tkinter.Label(self)
         self.picture.place(x=20, y=20)

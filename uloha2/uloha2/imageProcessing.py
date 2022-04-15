@@ -1,19 +1,13 @@
 from pickle import FALSE, TRUE
-from sys import flags
 import cv2
 import numpy
 import PIL.ImageTk
-import PIL.Image
-from cv2 import rectangle
-import matplotlib.pyplot as plt
-from IPython.display import display, clear_output
 import appGUI
 import math as m
-
-from tkinter import *
-from tkinter import ttk, filedialog
-from tkinter.filedialog import askopenfile
+from tkinter import filedialog
 import os
+
+
 
 
 
@@ -26,7 +20,18 @@ class ImgProc():
         self.fps = 0
         self.filepath =" "
         self.filepathExist=False
+        self.loadedImage= []
+        self.gImage=[]
+        self.lImageOrig=[]
+        self.imageIsprocesedFlag=False
 
+
+    def loadTESTimage(self):
+        file = os.getcwd()
+        file=file+"\\test_LOG.jpg" 
+        if file:
+            self.filepath = file
+            self.filepathExist =TRUE
 
     def buttonSetPathClicked(self):
 
@@ -50,7 +55,7 @@ class ImgProc():
                 outputImage[i-K,j-K]=numpy.sum(numpy.matmul(newSectionInImage,inputFilter))
         return outputImage
 
-    def functionLoG(self,img,size,sigma):
+    def pythonFunctionLoG(self,img,size,sigma):
 
             G0=cv2.GaussianBlur(img,(size,size),sigma)
             L0 = cv2.Laplacian(G0, ddepth=cv2.CV_16S, ksize=size)
@@ -140,19 +145,16 @@ class ImgProc():
         return k,size,sigma  
 
     def imgConvert(self):
-        GUI = appGUI.App()
 
-
+        
         print(str(self.filepath))
+
         if self.filepathExist is TRUE:
             
-
-
-         
             _,size,sigma =self.variables()
 
-            image = cv2.imread(self.filepath)
-            image_grey=self.preprocessIMG(image)
+            self.loadedImage = cv2.imread(self.filepath)
+            image_grey=self.preprocessIMG(self.loadedImage)
 
 
             v = numpy.array(range(-int(numpy.floor(size/2)), int(numpy.ceil(size/2))))
@@ -166,29 +168,46 @@ class ImgProc():
             ## Gaussian
             print("gauss")
 
-            gImage=self.GAUSS(image)
-            gImage=self.preprocessIMG(gImage)
+            self.gImage=self.GAUSS(self.loadedImage)
+            gImage_grey=self.preprocessIMG(self.gImage)
 
             ## laplacian
             print("lap")
-            lImage=self.LAPLACIAN(gImage,maskMatrixOn2,maskMatrixTOn2)
+            lImage=self.LAPLACIAN(gImage_grey,maskMatrixOn2,maskMatrixTOn2)
 
-            lImageOrig=self.LAPLACIAN(image_grey,maskMatrixOn2,maskMatrixTOn2)
+            self.lImageOrig=self.LAPLACIAN(image_grey,maskMatrixOn2,maskMatrixTOn2)
             print("end")
             
 
-            cv2.imshow("Loaded Image",image)
-            cv2.imshow("Gauss",gImage)
-            cv2.imshow("Laplacian",lImageOrig)
+            cv2.imshow("Loaded Image",self.loadedImage)
+            cv2.imshow("Gauss",self.gImage)
+            cv2.imshow("Laplacian",self.lImageOrig)
 
             cv2.imshow("LoG",lImage)
 
-            #self.functionLoG(imageGrey,size,sigma)
+            self.imageIsprocesedFlag=TRUE
 
-            self.convertImage(lImage)
+            #self.pythonFunctionLoG(imageGrey,size,sigma)
 
-            return self.imgtk
+            #img=self.convertImage(lImage)
+
+            #return img
+    
+    def getFalgImageisProcesed(self):
+        return self.imageIsprocesedFlag
         
-    def convertImage(self, cv2image):
-        img = PIL.Image.fromarray(cv2image)
-        self.imgtk = PIL.ImageTk.PhotoImage(image=img)
+    def convertImage(self, img):
+        scale_percent = 40 # percent of original size
+        width = int(img.shape[1] * scale_percent / 100)
+        height = int(img.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        
+        # resize image
+        resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+        return resized
+        
+
+
+
+
+
