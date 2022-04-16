@@ -39,8 +39,7 @@ class ImgProc():
         if file:
             self.filepath = os.path.abspath(file.name)
             self.filepathExist =TRUE
-     
-            
+         
     def conLap(self,inputImage,inputFilter):
         imageHeight = inputImage.shape[0]
         imageWidth = inputImage.shape[1]
@@ -66,7 +65,6 @@ class ImgProc():
     def preprocessIMG(self,img):
         img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         return img
-
 
     def calculateH(self,maskMatrixOn2,maskMatrixTOn2,sigma):
         pi=numpy.pi
@@ -179,10 +177,6 @@ class ImgProc():
             print("end")
             
 
-            cv2.imshow("Loaded Image",self.loadedImage)
-            cv2.imshow("Gauss",self.gImage)
-            cv2.imshow("Laplacian",self.lImageOrig)
-
             cv2.imshow("LoG",lImage)
 
             self.imageIsprocesedFlag=TRUE
@@ -192,6 +186,14 @@ class ImgProc():
             #img=self.convertImage(lImage)
 
             #return img
+    def showLoadedImage(self):
+        cv2.imshow("Loaded Image",self.loadedImage)
+
+    def showGaussImageImage(self):
+        cv2.imshow("Gauss",self.gImage)
+
+    def showLaplacianOriginalImage(self):
+        cv2.imshow("Laplacian",self.lImageOrig)
     
     def getFalgImageisProcesed(self):
         return self.imageIsprocesedFlag

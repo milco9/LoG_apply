@@ -2,12 +2,13 @@
 # Autor: Michal Molnar & Tomas Nyiri
 
 from cProfile import label
+from pickle import FALSE
 import appGUI
+import cv2
 import imageProcessing as imgProc
 
 
-if __name__ == "__main__":
-    defaultPicture= "No Tracking"
+def main():
     GUI = appGUI.App()
     imageProcess = imgProc.ImgProc(GUI)
 
@@ -15,18 +16,53 @@ if __name__ == "__main__":
     while True:
         
         if GUI.path:
+            GUI.updateText("Image is loaded")
+            GUI.update()
             imageProcess.buttonSetPathClicked()
             GUI.path=False
-        if GUI.loadTESTimageFlag:
+
+        if GUI.loadDEFAULTimageFlag:
+            GUI.updateText("Image is loaded")
+            GUI.update()
             imageProcess.loadTESTimage()
-            GUI.loadTESTimageFlag=False
-        if imageProcess.filepathExist:   
+            GUI.loadDEFAULTimageFlag=False
+
+        if imageProcess.filepathExist: 
+            GUI.updateText("Image is loaded") 
+            GUI.update()
             GUI.picture.configure(image=imageProcess.imgConvert())
             imageProcess.filepathExist=False
             GUI.imageIsprocesed=imageProcess.getFalgImageisProcesed()
+
+        if GUI.loadLaplacianimageFlag:
+            GUI.updateText("Image is loaded")
+            GUI.update()
+            imageProcess.showLaplacianOriginalImage()
+            GUI.loadLaplacianimageFlag=FALSE
+
+        if GUI.loadGaussImageFlag:
+            GUI.updateText("Image is loaded")
+            GUI.update()
+            imageProcess.showGaussImageImage()
+            GUI.loadGaussImageFlag=FALSE
+
+        if GUI.LoadedTestImage:
+            GUI.updateText("Image is loaded")
+            GUI.update()
+            imageProcess.showLoadedImage()
+            GUI.LoadedTestImage=FALSE
+
         GUI.update()
-        if 0xFF == ord('q'):
+        
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+    cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    main()
+
 
 
 
