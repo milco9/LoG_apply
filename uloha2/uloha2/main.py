@@ -2,7 +2,7 @@
 # Autor: Michal Molnar & Tomas Nyiri
 
 from cProfile import label
-from pickle import FALSE
+from pickle import FALSE, TRUE
 import appGUI
 import cv2
 import imageProcessing as imgProc
@@ -26,6 +26,7 @@ def main():
             GUI.update()
             imageProcess.loadTESTimage()
             GUI.loadDEFAULTimageFlag=False
+
 
         if imageProcess.filepathExist: 
             GUI.updateText("Image is loaded") 
@@ -52,10 +53,13 @@ def main():
             imageProcess.showLoadedImage()
             GUI.LoadedTestImage=FALSE
 
+        if GUI.closeFlag:
+            GUI.destroy()
+            break
+
         GUI.update()
         
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        
 
     cv2.destroyAllWindows()
 

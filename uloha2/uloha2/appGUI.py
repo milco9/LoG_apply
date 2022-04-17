@@ -1,7 +1,7 @@
 import tkinter
 
 from tkinter import *
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog,messagebox
 from tkinter.filedialog import askopenfile
 
 
@@ -18,6 +18,7 @@ class App(tkinter.Tk):
         self.textLabel="Just do it"
         self.loadGaussImageFlag=FALSE
         self.loadLaplacianimageFlag=FALSE
+        self.closeFlag=FALSE
         
 
 
@@ -64,6 +65,9 @@ class App(tkinter.Tk):
         self.buttonShowLoadedImage = ttk.Button(self, text = "Loaded image", command = self.buttonLoadedTestImage)
         self.buttonShowLoadedImage.place(x=680,y=351)
 
+        self.closeButton = ttk.Button(self, text = "Close program", command = self.closeFunction)
+        self.closeButton.place(x=680,y=481)
+
         self.picture = tkinter.Label(self)
         self.picture.place(x=20, y=20)
 
@@ -71,6 +75,10 @@ class App(tkinter.Tk):
     
     def updateText(self,inputText):
         self.labelText.configure(text=inputText)
+
+    def closeFunction(self):
+        self.closeFlag=TRUE
+
 
 
        

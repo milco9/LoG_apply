@@ -24,6 +24,8 @@ class ImgProc():
         self.gImage=[]
         self.lImageOrig=[]
         self.imageIsprocesedFlag=False
+        self.firstGauss=TRUE
+        self.firstLap=TRUE
 
 
     def loadTESTimage(self):
@@ -84,6 +86,10 @@ class ImgProc():
 
             laplacian=h-numpy.sum(h)/(size**2)
 
+            if self.firstLap is TRUE:
+                print(laplacian)
+                self.firstLap=FALSE
+
             laplacian = self.conLap(img,laplacian)
             laplacian= laplacian/numpy.max(laplacian)
 
@@ -117,6 +123,10 @@ class ImgProc():
         k,_,_ =self.variables()
 
         kernel = self.createKernelGauss()
+
+        if self.firstGauss is TRUE:
+            print(kernel)
+            self.firstGauss=FALSE
 
         height,width = img_gray.shape
         kernel_height,_ = kernel.shape
@@ -186,6 +196,7 @@ class ImgProc():
             #img=self.convertImage(lImage)
 
             #return img
+            
     def showLoadedImage(self):
         cv2.imshow("Loaded Image",self.loadedImage)
 
