@@ -43,17 +43,26 @@ class ImgProc():
             self.filepathExist =TRUE
          
     def conLap(self,inputImage,inputFilter):
+
+
         imageHeight = inputImage.shape[0]
         imageWidth = inputImage.shape[1]
         filterShapeZero = inputFilter.shape[0]
         K = int(numpy.floor(filterShapeZero/2))
         filterHigh=inputFilter.shape[0]
-        outputImage=numpy.zeros((imageHeight-filterHigh+1, imageWidth-filterHigh+1))
+        filterWidth=inputFilter.shape[1]
+
+        newImageHeight=imageHeight-filterHigh+1
+        newImageWidth =imageWidth-filterWidth+1
+
+        outputImage=numpy.zeros((newImageHeight, newImageWidth))
 
         for i in range(K,imageHeight-K-1):
             for j in range(K,imageWidth-K-1):
                 newSectionInImage=inputImage[i-K:i+1+K,j-K:j+1+K]
                 outputImage[i-K,j-K]=numpy.sum(numpy.matmul(newSectionInImage,inputFilter))
+
+
         return outputImage
 
     def pythonFunctionLoG(self,img,size,sigma):
