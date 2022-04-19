@@ -60,7 +60,8 @@ class ImgProc():
         for i in range(K,imageHeight-K-1):
             for j in range(K,imageWidth-K-1):
                 newSectionInImage=inputImage[i-K:i+1+K,j-K:j+1+K]
-                outputImage[i-K,j-K]=numpy.sum(numpy.matmul(newSectionInImage,inputFilter))
+                imageXfilter=numpy.matmul(newSectionInImage,inputFilter)
+                outputImage[i-K,j-K]=numpy.sum(imageXfilter)
 
 
         return outputImage
@@ -200,11 +201,15 @@ class ImgProc():
 
             self.imageIsprocesedFlag=TRUE
 
-            #self.pythonFunctionLoG(imageGrey,size,sigma)
+            
 
-            #img=self.convertImage(lImage)
+            self.convertImage(lImage)
 
-            #return img
+            print(lImage.shape)
+            h,w=lImage.shape
+
+            
+            return h,w,self.imgtk
             
     def showLoadedImage(self):
         cv2.imshow("Loaded Image",self.loadedImage)
@@ -217,16 +222,17 @@ class ImgProc():
     
     def getFalgImageisProcesed(self):
         return self.imageIsprocesedFlag
+
+    def getLOGpythonfunctions(self):
+        _,size,sigma =self.variables()
+        self.pythonFunctionLoG(self.loadedImage,size,sigma)
+
+    def convertImage(self, image):
+        img = PIL.Image.fromarray(image)
+        self.imgtk = PIL.ImageTk.PhotoImage(image=img)
         
-    def convertImage(self, img):
-        scale_percent = 40 # percent of original size
-        width = int(img.shape[1] * scale_percent / 100)
-        height = int(img.shape[0] * scale_percent / 100)
-        dim = (width, height)
-        
-        # resize image
-        resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
-        return resized
+
+
         
 
 
