@@ -172,7 +172,7 @@ class ImgProc():
             _,size,sigma =self.variables()
 
             self.loadedImage = cv2.imread(self.filepath)
-            image_grey=self.preprocessIMG(self.loadedImage)
+            
 
 
             v = numpy.array(range(-int(numpy.floor(size/2)), int(numpy.ceil(size/2))))
@@ -193,7 +193,7 @@ class ImgProc():
             print("lap")
             lImage=self.LAPLACIAN(gImage_grey,maskMatrixOn2,maskMatrixTOn2)
 
-            self.lImageOrig=self.LAPLACIAN(image_grey,maskMatrixOn2,maskMatrixTOn2)
+            
             print("end")
             
 
@@ -218,6 +218,19 @@ class ImgProc():
         cv2.imshow("Gauss",self.gImage)
 
     def showLaplacianOriginalImage(self):
+
+        _,size,sigma =self.variables()
+          
+        v = numpy.array(range(-int(numpy.floor(size/2)), int(numpy.ceil(size/2))))
+        
+        maskMatrix = numpy.ones((size,1))*v
+        maskMatrixT = maskMatrix.T
+
+        maskMatrixOn2=maskMatrix**2
+        maskMatrixTOn2=maskMatrixT**2
+
+        image_grey=self.preprocessIMG(self.loadedImage)
+        self.lImageOrig=self.LAPLACIAN(image_grey,maskMatrixOn2,maskMatrixTOn2)
         cv2.imshow("Laplacian",self.lImageOrig)
     
     def getFalgImageisProcesed(self):

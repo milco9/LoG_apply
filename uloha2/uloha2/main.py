@@ -11,55 +11,76 @@ import imageProcessing as imgProc
 def main():
     GUI = appGUI.App()
     imageProcess = imgProc.ImgProc(GUI)
+    GUI.updateText("CHOOS img")
+    GUI.update()
 
 
     while True:
         
         if GUI.path:
-            GUI.updateText("Image is loaded")
-            GUI.update()
             imageProcess.buttonSetPathClicked()
             GUI.path=False
 
         if GUI.loadDEFAULTimageFlag:
-            GUI.updateText("Image is loaded")
-            GUI.update()
             imageProcess.loadTESTimage()
             GUI.loadDEFAULTimageFlag=False
 
-
         if imageProcess.filepathExist: 
             GUI.updateText("Image is loaded") 
+            GUI.update()
             GUI.pictureHight,GUI.pictureWidth,imageConverted=imageProcess.imgConvert()
+            imageProcess.filepathExist=False
             GUI.update()
             #GUI.picture.configure(image=imageConverted)
-            imageProcess.filepathExist=False
             GUI.imageIsprocesed=imageProcess.getFalgImageisProcesed()
 
-        if GUI.loadLaplacianimageFlag:
-            GUI.updateText("Image is loaded")
-            GUI.update()
-            imageProcess.showLaplacianOriginalImage()
-            GUI.loadLaplacianimageFlag=FALSE
 
+        if GUI.loadLaplacianimageFlag:
+            if imageProcess.filepathExist: 
+                GUI.updateText("LAP show")
+                GUI.loadLaplacianimageFlag=FALSE
+                GUI.update()
+                imageProcess.showLaplacianOriginalImage()
+            else:
+                GUI.updateText("LOAD PICTUE !")
+                GUI.loadLaplacianimageFlag=FALSE
+                GUI.update()
+
+ 
         if GUI.loadGaussImageFlag:
-            GUI.updateText("Image is loaded")
-            GUI.update()
-            imageProcess.showGaussImageImage()
-            GUI.loadGaussImageFlag=FALSE
+            if imageProcess.filepathExist:
+                GUI.updateText("GAUS show")
+                GUI.loadGaussImageFlag=FALSE
+                GUI.update()
+                imageProcess.showGaussImageImage()
+            else:
+                GUI.updateText("LOAD PICTUE !")
+                GUI.loadGaussImageFlag=FALSE
+                GUI.update()
 
         if GUI.LoadedTestImage:
-            GUI.updateText("Image is loaded")
-            GUI.update()
-            imageProcess.showLoadedImage()
-            GUI.LoadedTestImage=FALSE
+            if imageProcess.filepathExist: 
+                GUI.updateText("Original image")
+                GUI.LoadedTestImage=FALSE
+                GUI.update()
+                imageProcess.showLoadedImage()
+            else:
+                GUI.updateText("LOAD PICTUE !")
+                GUI.LoadedTestImage=FALSE
+                GUI.update()
         
         if GUI.logImageFlag:
-            GUI.updateText("Orig. LoG")
-            GUI.update()
-            print("volam")
-            imageProcess.getLOGpythonfunctions()
-            GUI.logImageFlag=FALSE
+            if imageProcess.filepathExist:
+                GUI.updateText("Orig. LoG")
+                print("volam")
+                GUI.logImageFlag=FALSE
+                GUI.update()
+                imageProcess.getLOGpythonfunctions()
+            else:
+                GUI.updateText("LOAD PICTUE !")
+                GUI.logImageFlag=FALSE
+                GUI.update()
+
 
         if GUI.closeFlag:
             GUI.destroy()
