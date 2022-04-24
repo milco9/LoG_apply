@@ -44,7 +44,7 @@ class ImgProc():
          
     def conLap(self,inputImage,inputFilter):
 
-
+        ## Zistujeme informacie o oprazku a o filtry pre forka
         imageHeight = inputImage.shape[0]
         imageWidth = inputImage.shape[1]
         filterShapeZero = inputFilter.shape[0]
@@ -54,16 +54,16 @@ class ImgProc():
 
         newImageHeight=imageHeight-filterHigh+1
         newImageWidth =imageWidth-filterWidth+1
-
+        ## Vytvorime prazdny image
         outputImage=numpy.zeros((newImageHeight, newImageWidth))
-
+        ## Aplikovanie konvolucie
         for i in range(K,imageHeight-K-1):
             for j in range(K,imageWidth-K-1):
                 newSectionInImage=inputImage[i-K:i+1+K,j-K:j+1+K]
                 imageXfilter=numpy.matmul(newSectionInImage,inputFilter)
                 outputImage[i-K,j-K]=numpy.sum(imageXfilter)
-
-
+        outputImage= outputImage/numpy.max(outputImage)
+        
         return outputImage
 
     def pythonFunctionLoG(self,img,size,sigma):
@@ -78,30 +78,32 @@ class ImgProc():
         img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         return img
 
-    def calculateH(self,maskMatrixOn2,maskMatrixTOn2,sigma):
+    def createFilter(self,maskMatrixOn2,maskMatrixTOn2):
+        _,size,sigma =self.variables()
+
         pi=numpy.pi
         sigmaOn2=sigma**2
 
-        h=numpy.exp(-(maskMatrixOn2 + maskMatrixTOn2)/(2*sigmaOn2))
+        h=(numpy.exp(-(maskMatrixOn2 + maskMatrixTOn2)/(2*sigmaOn2)))
 
         h=h*(maskMatrixOn2 +maskMatrixTOn2-2*sigmaOn2)/(2*pi*sigma**6)
 
-        return h
+        laplacianFilter=h-numpy.sum(h)/(size**2)
+
+        return laplacianFilter
 
     def LAPLACIAN(self,img,maskMatrixOn2,maskMatrixTOn2):
 
-            _,size,sigma =self.variables()
-
-            h=self.calculateH(maskMatrixOn2,maskMatrixTOn2,sigma)
-
-            laplacian=h-numpy.sum(h)/(size**2)
+                ## taktiez najskor si vytvorime filter
+            laplacianFilter=self.createFilter(maskMatrixOn2,maskMatrixTOn2)
 
             if self.firstLap is TRUE:
-                print(laplacian)
+                print(laplacianFilter)
                 self.firstLap=FALSE
 
-            laplacian = self.conLap(img,laplacian)
-            laplacian= laplacian/numpy.max(laplacian)
+            laplacian = self.conLap(img,laplacianFilter)
+
+            
 
             return laplacian
 
@@ -112,6 +114,8 @@ class ImgProc():
         img_GG = self.applyFilter(G)
         img_GR = self.applyFilter(R)
         img = cv2.merge([img_GB,img_GG,img_GR])
+        self.gImage=img
+        img=self.preprocessIMG(img)
 
         return img
 
@@ -130,8 +134,10 @@ class ImgProc():
 
     def applyFilter(self,img_gray):
 
+            ## Naciatanie premennych o filtri
         k,_,_ =self.variables()
 
+            ## Vytvorenie filtra
         kernel = self.createKernelGauss()
 
         if self.firstGauss is TRUE:
@@ -146,6 +152,7 @@ class ImgProc():
         rowRange =(halfKernelHeight,height-halfKernelHeight)
         colRange =(halfKernelHeight,width-halfKernelHeight)
 
+                ## Aplikovanie filtra na obrazok kde sa spravy konvolucia tj vynasobi sa filter kazdym pixelom a nahradi sa suma v obrazku na danych indexoch
         for i in range(rowRange[1]):
             for j in range(colRange[1]):
                 sum = 0
@@ -169,25 +176,27 @@ class ImgProc():
 
         if self.filepathExist is TRUE:
             
+            ## tuna sa len nacitaju premenne 
             _,size,sigma =self.variables()
 
+            ## nacita sa zadany obrazok
             self.loadedImage = cv2.imread(self.filepath)
             
+            # Vytvori sa pole -1 0 1
+            v = numpy.array(range(-int(numpy.floor(size/2)), int(numpy.ceil(size/2)))) 
 
-
-            v = numpy.array(range(-int(numpy.floor(size/2)), int(numpy.ceil(size/2))))
-
+            # Z pola sa vytvori matica
             maskMatrix = numpy.ones((size,1))*v
             maskMatrixT = maskMatrix.T
 
             maskMatrixOn2=maskMatrix**2
             maskMatrixTOn2=maskMatrixT**2
 
-            ## Gaussian
+            ## Gaussian 
             print("gauss")
 
-            self.gImage=self.GAUSS(self.loadedImage)
-            gImage_grey=self.preprocessIMG(self.gImage)
+            gImage_grey=self.GAUSS(self.loadedImage)
+
 
             ## laplacian
             print("lap")

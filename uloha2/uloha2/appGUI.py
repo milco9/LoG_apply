@@ -48,7 +48,7 @@ class App(tkinter.Tk):
     def createWigets(self):
         style = ttk.Style()
 
-        xShiftPicture =20
+        xShiftPicture =0
         xShiftWidgets=30+xShiftPicture
         self.xGeometry = xShiftWidgets+150+self.pictureWidth
         print(self.xGeometry)

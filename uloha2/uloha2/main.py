@@ -11,6 +11,7 @@ import imageProcessing as imgProc
 def main():
     GUI = appGUI.App()
     imageProcess = imgProc.ImgProc(GUI)
+    pathIsSaved= FALSE
     GUI.updateText("CHOOS img")
     GUI.update()
 
@@ -29,6 +30,7 @@ def main():
             GUI.updateText("Image is loaded") 
             GUI.update()
             GUI.pictureHight,GUI.pictureWidth,imageConverted=imageProcess.imgConvert()
+            pathIsSaved= TRUE
             imageProcess.filepathExist=False
             GUI.update()
             #GUI.picture.configure(image=imageConverted)
@@ -36,7 +38,7 @@ def main():
 
 
         if GUI.loadLaplacianimageFlag:
-            if imageProcess.filepathExist: 
+            if pathIsSaved: 
                 GUI.updateText("LAP show")
                 GUI.loadLaplacianimageFlag=FALSE
                 GUI.update()
@@ -48,7 +50,7 @@ def main():
 
  
         if GUI.loadGaussImageFlag:
-            if imageProcess.filepathExist:
+            if pathIsSaved:
                 GUI.updateText("GAUS show")
                 GUI.loadGaussImageFlag=FALSE
                 GUI.update()
@@ -59,7 +61,7 @@ def main():
                 GUI.update()
 
         if GUI.LoadedTestImage:
-            if imageProcess.filepathExist: 
+            if pathIsSaved: 
                 GUI.updateText("Original image")
                 GUI.LoadedTestImage=FALSE
                 GUI.update()
@@ -70,7 +72,7 @@ def main():
                 GUI.update()
         
         if GUI.logImageFlag:
-            if imageProcess.filepathExist:
+            if pathIsSaved:
                 GUI.updateText("Orig. LoG")
                 print("volam")
                 GUI.logImageFlag=FALSE
