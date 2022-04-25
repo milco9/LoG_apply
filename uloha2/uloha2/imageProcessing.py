@@ -26,6 +26,7 @@ class ImgProc():
         self.imageIsprocesedFlag=False
         self.firstGauss=TRUE
         self.firstLap=TRUE
+        self.k=1     ## Odskusane velkosti filtra kde k=1;2;4
 
 
     def loadTESTimage(self):
@@ -37,7 +38,7 @@ class ImgProc():
 
     def buttonSetPathClicked(self):
 
-        file = filedialog.askopenfile(mode='r', filetypes=[("Image Files", ".png .jfif, .jpg, .jpeg")])
+        file = filedialog.askopenfile(mode='r', filetypes=[("Image Files", ".png .jfif, .jpg, .jpeg, .JPG")])
         if file:
             self.filepath = os.path.abspath(file.name)
             self.filepathExist =TRUE
@@ -163,7 +164,7 @@ class ImgProc():
         return img_gray
 
     def variables(self):  
-        k=1
+        k=self.k
         size = 2*k+1
         sigma =0.9     
 

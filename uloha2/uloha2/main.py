@@ -15,6 +15,8 @@ def main():
     GUI.updateText("CHOOS img")
     GUI.update()
 
+    imageProcess.k=2 ## Odskusane velkosti filtra kde k=1;2;4
+
 
     while True:
         
