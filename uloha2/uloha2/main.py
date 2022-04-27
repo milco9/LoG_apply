@@ -4,6 +4,7 @@
 from cProfile import label
 from pickle import FALSE, TRUE
 import appGUI
+import devGUI as dev
 import cv2
 import imageProcessing as imgProc
 
@@ -12,10 +13,12 @@ def main():
     GUI = appGUI.App()
     imageProcess = imgProc.ImgProc(GUI)
     pathIsSaved= FALSE
+    devGuiOpener=TRUE
     GUI.updateText("CHOOS img")
     GUI.update()
 
     imageProcess.k=2 ## Odskusane velkosti filtra kde k=1;2;4
+    imageProcess.slowGauss==False  ## Rychlejsi vypocet gaussiana pomalsi sa zachoval v kode pre porovnanie rychlosti 
 
 
     while True:
@@ -73,6 +76,13 @@ def main():
                 GUI.LoadedTestImage=FALSE
                 GUI.update()
         
+        if GUI.devGUIFLAG:
+            if devGuiOpener is TRUE:
+                devGUI = dev.devApp()
+                print("otvaram gui")
+                devGuiOpener = FALSE
+
+
         if GUI.logImageFlag:
             if pathIsSaved:
                 GUI.updateText("Orig. LoG")

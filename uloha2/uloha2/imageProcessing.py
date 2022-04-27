@@ -27,6 +27,7 @@ class ImgProc():
         self.firstGauss=TRUE
         self.firstLap=TRUE
         self.k=1     ## Odskusane velkosti filtra kde k=1;2;4
+        self.slowGauss=False
 
 
     def loadTESTimage(self):
@@ -80,6 +81,7 @@ class ImgProc():
         return img
 
     def createFilter(self,maskMatrixOn2,maskMatrixTOn2):
+
         _,size,sigma =self.variables()
 
         pi=numpy.pi
@@ -110,14 +112,19 @@ class ImgProc():
 
     def GAUSS(self,img):
 
-        B,G,R = cv2.split(img)
-        img_GB = self.applyFilter(B)
-        img_GG = self.applyFilter(G)
-        img_GR = self.applyFilter(R)
-        img = cv2.merge([img_GB,img_GG,img_GR])
-        self.gImage=img
-        img=self.preprocessIMG(img)
+        if self.slowGauss:
+            B,G,R = cv2.split(img)
+            img_GB = self.slowGausCONV(B)
+            img_GG = self.slowGausCONV(G)
+            img_GR = self.slowGausCONV(R)
+            img = cv2.merge([img_GB,img_GG,img_GR])
+            img=self.preprocessIMG(img)
+        else :
+            img = self.fastGaussCONV(img)
 
+        ## Zapisanie do globalnej premennej na zobrazenie gauusiana
+        self.gImage=img
+        
         return img
 
     def createKernelGauss(self):
@@ -133,7 +140,40 @@ class ImgProc():
         ker= ker/(numpy.sum(ker)) 
         return ker
 
-    def applyFilter(self,img_gray):
+    def fastGaussCONV(self,img):
+        ## Naciatanie premennych o filtri
+        k,_,_ =self.variables()
+
+        img=self.preprocessIMG(img)
+
+            ## Vytvorenie filtra
+        kernel = self.createKernelGauss()
+
+        if self.firstGauss is TRUE:
+            print(kernel)
+            self.firstGauss=FALSE
+
+        img_height,img_width = img.shape
+        kernel_height,kernel_width = kernel.shape
+        
+        halfKernelHeight = (int(kernel_height/2))
+
+        newImageHeight=img_height-kernel_height+1
+        newImageWidth =img_width-kernel_width+1
+
+        outputImage=numpy.zeros((newImageHeight, newImageWidth))
+
+        for i in range(halfKernelHeight,img_height-halfKernelHeight-1):
+            for j in range(halfKernelHeight,img_width-halfKernelHeight-1):
+                newSectionInImage=img[i-halfKernelHeight:i+1+halfKernelHeight,j-halfKernelHeight:j+1+halfKernelHeight]
+                imageXfilter=numpy.matmul(newSectionInImage,kernel)
+                outputImage[i-halfKernelHeight,j-halfKernelHeight]=numpy.sum(imageXfilter)
+        outputImage= outputImage/numpy.max(outputImage)
+        
+        return outputImage
+
+
+    def slowGausCONV(self,img_gray):
 
             ## Naciatanie premennych o filtri
         k,_,_ =self.variables()

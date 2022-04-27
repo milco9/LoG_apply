@@ -6,11 +6,11 @@ from tkinter import ttk, filedialog,messagebox
 from tkinter.filedialog import askopenfile
 
 
-class App(tkinter.Tk):
+class devApp(tkinter.Tk):
     def __init__(self):
         super().__init__()
         #self.geometry("100x530")
-        self.title(" Uloha2")
+        self.title("DEV GUI")
         self.path=FALSE
         self.loadDEFAULTimageFlag = FALSE
         self.imageIsprocesed=FALSE
@@ -22,7 +22,6 @@ class App(tkinter.Tk):
         self.pictureWidth=10
         self.logImageFlag=False
         self.createWigets()
-        self.devGUIFLAG=False
         
 
 
@@ -43,9 +42,6 @@ class App(tkinter.Tk):
     
     def buttonLOGImage(self):
         self.logImageFlag=True
-    
-    def buttonDEVGUI(self):
-        self.devGUIFLAG=True
 
 
 
@@ -56,7 +52,7 @@ class App(tkinter.Tk):
         xShiftWidgets=30+xShiftPicture
         self.xGeometry = xShiftWidgets+150+self.pictureWidth
         print(self.xGeometry)
-        self.yGeometry = 580
+        self.yGeometry = 530
 
         self.buttonLoadImage = ttk.Button(self, text = "Load image", command = self.buttonSetPathToImage)
         self.buttonLoadImage.place(x=xShiftWidgets,y=21)
@@ -83,11 +79,8 @@ class App(tkinter.Tk):
         self.buttonLoGImage = ttk.Button(self, text = "Orig Log fcn", command = self.buttonLOGImage)
         self.buttonLoGImage.place(x=xShiftWidgets,y=411)
 
-        self.buttonDEVGui= ttk.Button(self, text = "Open dev GUI", command = self.buttonDEVGUI)
-        self.buttonDEVGui.place(x=xShiftWidgets,y=481)
-
         self.closeButton = ttk.Button(self, text = "Close program", command = self.closeFunction)
-        self.closeButton.place(x=xShiftWidgets,y=541)
+        self.closeButton.place(x=xShiftWidgets,y=481)
 
         self.picture = tkinter.Label(self)
         self.picture.place(x=20, y=20)
