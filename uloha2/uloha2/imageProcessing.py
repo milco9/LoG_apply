@@ -140,8 +140,6 @@ class ImgProc():
         return ker
 
     def fastGaussCONV(self,img):
-        ## Naciatanie premennych o filtri
-        k,_,_ =self.variables()
 
         img=self.preprocessIMG(img)
 
@@ -173,6 +171,7 @@ class ImgProc():
     def matrixMultiply(self,imageMatrix,filterMatrix):
         img_height,img_width = imageMatrix.shape
 
+        outputSUM=0
         outputMatrix=numpy.zeros((img_height, img_width))
 
         if False:
@@ -184,8 +183,9 @@ class ImgProc():
             for i in range (len(imageMatrix)):
                 for j in range (len(filterMatrix)):
                         outputMatrix[i][j]= imageMatrix[i][j]*filterMatrix[i][j]
+                        outputSUM +=outputMatrix[i][j]
         
-        return numpy.sum(outputMatrix)
+        return outputSUM
                 
 
 

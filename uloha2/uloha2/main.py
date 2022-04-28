@@ -15,7 +15,7 @@ def main():
     GUI.updateText("CHOOS img")
     GUI.update()
 
-    imageProcess.k=1 ## Odskusane velkosti filtra kde k=1;2;4
+    imageProcess.k=2 ## Odskusane velkosti filtra kde k=1;2;4
     imageProcess.slowGauss==False  ## Rychlejsi vypocet gaussiana pomalsi sa zachoval v kode pre porovnanie rychlosti 
 
 
