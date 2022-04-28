@@ -62,8 +62,7 @@ class ImgProc():
         for i in range(K,imageHeight-K-1):
             for j in range(K,imageWidth-K-1):
                 newSectionInImage=inputImage[i-K:i+1+K,j-K:j+1+K]
-                imageXfilter=numpy.matmul(newSectionInImage,inputFilter)
-                outputImage[i-K,j-K]=numpy.sum(imageXfilter)
+                outputImage[i-K,j-K]=self.matrixMultiply(newSectionInImage,inputFilter)
         outputImage= outputImage/numpy.max(outputImage)
         
         return outputImage
@@ -166,11 +165,28 @@ class ImgProc():
         for i in range(halfKernelHeight,img_height-halfKernelHeight-1):
             for j in range(halfKernelHeight,img_width-halfKernelHeight-1):
                 newSectionInImage=img[i-halfKernelHeight:i+1+halfKernelHeight,j-halfKernelHeight:j+1+halfKernelHeight]
-                imageXfilter=numpy.matmul(newSectionInImage,kernel)
-                outputImage[i-halfKernelHeight,j-halfKernelHeight]=numpy.sum(imageXfilter)
+                outputImage[i-halfKernelHeight,j-halfKernelHeight]=self.matrixMultiply(newSectionInImage,kernel)
         outputImage= outputImage/numpy.max(outputImage)
         
         return outputImage
+
+    def matrixMultiply(self,imageMatrix,filterMatrix):
+        img_height,img_width = imageMatrix.shape
+
+        outputMatrix=numpy.zeros((img_height, img_width))
+
+        if False:
+            for i in range (len(imageMatrix)):
+                for j in range (len(filterMatrix)):
+                    for k in range(len(imageMatrix)):
+                       outputMatrix[i][j]= imageMatrix[i][k]*filterMatrix[k][j]
+        else:
+            for i in range (len(imageMatrix)):
+                for j in range (len(filterMatrix)):
+                        outputMatrix[i][j]= imageMatrix[i][j]*filterMatrix[i][j]
+        
+        return numpy.sum(outputMatrix)
+                
 
 
     def slowGausCONV(self,img_gray):

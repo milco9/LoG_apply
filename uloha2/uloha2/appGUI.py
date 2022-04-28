@@ -22,7 +22,6 @@ class App(tkinter.Tk):
         self.pictureWidth=10
         self.logImageFlag=False
         self.createWigets()
-        self.devGUIFLAG=False
         
 
 
@@ -43,9 +42,6 @@ class App(tkinter.Tk):
     
     def buttonLOGImage(self):
         self.logImageFlag=True
-    
-    def buttonDEVGUI(self):
-        self.devGUIFLAG=True
 
 
 
@@ -83,11 +79,8 @@ class App(tkinter.Tk):
         self.buttonLoGImage = ttk.Button(self, text = "Orig Log fcn", command = self.buttonLOGImage)
         self.buttonLoGImage.place(x=xShiftWidgets,y=411)
 
-        self.buttonDEVGui= ttk.Button(self, text = "Open dev GUI", command = self.buttonDEVGUI)
-        self.buttonDEVGui.place(x=xShiftWidgets,y=481)
-
         self.closeButton = ttk.Button(self, text = "Close program", command = self.closeFunction)
-        self.closeButton.place(x=xShiftWidgets,y=541)
+        self.closeButton.place(x=xShiftWidgets,y=481)
 
         self.picture = tkinter.Label(self)
         self.picture.place(x=20, y=20)
