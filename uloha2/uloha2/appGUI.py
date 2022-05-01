@@ -21,6 +21,7 @@ class App(tkinter.Tk):
         self.pictureHight=10
         self.pictureWidth=10
         self.logImageFlag=False
+        self.GraphFlag=False
         self.createWigets()
         
 
@@ -42,6 +43,9 @@ class App(tkinter.Tk):
     
     def buttonLOGImage(self):
         self.logImageFlag=True
+    
+    def showGraph(self):
+        self.GraphFlag=True
 
 
 
@@ -79,8 +83,11 @@ class App(tkinter.Tk):
         self.buttonLoGImage = ttk.Button(self, text = "Orig Log fcn", command = self.buttonLOGImage)
         self.buttonLoGImage.place(x=xShiftWidgets,y=411)
 
+        self.graphButton = ttk.Button(self, text = "Show Graph", command = self.showGraph)
+        self.graphButton.place(x=xShiftWidgets,y=481)
+
         self.closeButton = ttk.Button(self, text = "Close program", command = self.closeFunction)
-        self.closeButton.place(x=xShiftWidgets,y=481)
+        self.closeButton.place(x=xShiftWidgets,y=541)
 
         self.picture = tkinter.Label(self)
         self.picture.place(x=20, y=20)

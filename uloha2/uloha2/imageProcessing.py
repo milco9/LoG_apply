@@ -3,6 +3,7 @@ import cv2
 import numpy
 import PIL.ImageTk
 import appGUI
+import matplotlib.pyplot
 import math as m
 from tkinter import filedialog
 import os
@@ -28,6 +29,8 @@ class ImgProc():
         self.firstLap=TRUE
         self.k=1     ## Odskusane velkosti filtra kde k=1;2;4
         self.slowGauss=False
+        self.GaussFilter=[]
+        self.LoGFilter=[]
 
 
     def loadTESTimage(self):
@@ -56,13 +59,16 @@ class ImgProc():
 
         newImageHeight=imageHeight-filterHigh+1
         newImageWidth =imageWidth-filterWidth+1
+
         ## Vytvorime prazdny image
         outputImage=numpy.zeros((newImageHeight, newImageWidth))
+
         ## Aplikovanie konvolucie
         for i in range(K,imageHeight-K-1):
             for j in range(K,imageWidth-K-1):
-                newSectionInImage=inputImage[i-K:i+1+K,j-K:j+1+K]
-                outputImage[i-K,j-K]=self.matrixMultiply(newSectionInImage,inputFilter)
+                outputImage[i-K,j-K]=self.matrixMultiply(inputImage[i-K:i+1+K,j-K:j+1+K],inputFilter)
+
+
         outputImage= outputImage/numpy.max(outputImage)
         
         return outputImage
@@ -91,6 +97,8 @@ class ImgProc():
         h=h*(maskMatrixOn2 +maskMatrixTOn2-2*sigmaOn2)/(2*pi*sigma**6)
 
         laplacianFilter=h-numpy.sum(h)/(size**2)
+
+        self.LoGFilter=laplacianFilter
 
         return laplacianFilter
 
@@ -137,6 +145,9 @@ class ImgProc():
                 n = -((i-k)**2 + (j-k)**2)
                 ker[i,j] = m.exp(n/(2*(sigma**2)))/2*pi*(sigma**2)
         ker= ker/(numpy.sum(ker)) 
+
+        self.GaussFilter=ker
+
         return ker
 
     def fastGaussCONV(self,img):
@@ -162,8 +173,7 @@ class ImgProc():
 
         for i in range(halfKernelHeight,img_height-halfKernelHeight-1):
             for j in range(halfKernelHeight,img_width-halfKernelHeight-1):
-                newSectionInImage=img[i-halfKernelHeight:i+1+halfKernelHeight,j-halfKernelHeight:j+1+halfKernelHeight]
-                outputImage[i-halfKernelHeight,j-halfKernelHeight]=self.matrixMultiply(newSectionInImage,kernel)
+                outputImage[i-halfKernelHeight,j-halfKernelHeight]=self.matrixMultiply(img[i-halfKernelHeight:i+1+halfKernelHeight,j-halfKernelHeight:j+1+halfKernelHeight],kernel)
         outputImage= outputImage/numpy.max(outputImage)
         
         return outputImage
@@ -174,16 +184,11 @@ class ImgProc():
         outputSUM=0
         outputMatrix=numpy.zeros((img_height, img_width))
 
-        if False:
-            for i in range (len(imageMatrix)):
-                for j in range (len(filterMatrix)):
-                    for k in range(len(imageMatrix)):
-                       outputMatrix[i][j]= imageMatrix[i][k]*filterMatrix[k][j]
-        else:
-            for i in range (len(imageMatrix)):
-                for j in range (len(filterMatrix)):
-                        outputMatrix[i][j]= imageMatrix[i][j]*filterMatrix[i][j]
-                        outputSUM +=outputMatrix[i][j]
+
+        for i in range (len(imageMatrix)):
+            for j in range (len(filterMatrix)):
+                    outputMatrix[i][j]= imageMatrix[i][j]*filterMatrix[i][j]
+                    outputSUM +=outputMatrix[i][j]
         
         return outputSUM
                 
@@ -266,7 +271,6 @@ class ImgProc():
             cv2.imshow("LoG",lImage)
 
             self.imageIsprocesedFlag=TRUE
-
             
 
             self.convertImage(lImage)
@@ -309,6 +313,15 @@ class ImgProc():
     def convertImage(self, image):
         img = PIL.Image.fromarray(image)
         self.imgtk = PIL.ImageTk.PhotoImage(image=img)
+
+    def showFIlterGraph(self):
+        fig, axes = matplotlib.pyplot.subplots(nrows=2, ncols=1, constrained_layout=True, figsize=matplotlib.pyplot.figaspect(1))
+        graphGauss = axes[0].pcolormesh(self.GaussFilter)
+        fig.colorbar(graphGauss, ax=axes[0])
+        graphLoG = axes[1].pcolormesh(self.LoGFilter)
+        fig.colorbar(graphLoG, ax=axes[1])
+        matplotlib.pyplot.show()
+                
         
 
 

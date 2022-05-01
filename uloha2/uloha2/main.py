@@ -6,6 +6,7 @@ from pickle import FALSE, TRUE
 import appGUI
 import cv2
 import imageProcessing as imgProc
+import matplotlib.pyplot
 
 
 def main():
@@ -15,7 +16,7 @@ def main():
     GUI.updateText("CHOOS img")
     GUI.update()
 
-    imageProcess.k=2 ## Odskusane velkosti filtra kde k=1;2;4
+    imageProcess.k=4 ## Odskusane velkosti filtra kde k=1;2;4
     imageProcess.slowGauss==False  ## Rychlejsi vypocet gaussiana pomalsi sa zachoval v kode pre porovnanie rychlosti 
 
 
@@ -73,6 +74,16 @@ def main():
                 GUI.updateText("LOAD PICTUE !")
                 GUI.LoadedTestImage=FALSE
                 GUI.update()
+
+        if GUI.GraphFlag:
+            if pathIsSaved: 
+                GUI.GraphFlag=FALSE
+                GUI.update()
+                imageProcess.showFIlterGraph()
+            else:
+                GUI.updateText("LOAD PICTUE !")
+                GUI.GraphFlag=FALSE
+                GUI.update()
     
 
 
@@ -91,6 +102,7 @@ def main():
 
         if GUI.closeFlag:
             GUI.destroy()
+            
             break
 
         GUI.update()
@@ -98,6 +110,7 @@ def main():
         
 
     cv2.destroyAllWindows()
+    matplotlib.pyplot.close('all')
 
 
 if __name__ == "__main__":
