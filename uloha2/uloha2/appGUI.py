@@ -55,7 +55,6 @@ class App(tkinter.Tk):
         xShiftPicture =0
         xShiftWidgets=30+xShiftPicture
         self.xGeometry = xShiftWidgets+150+self.pictureWidth
-        print(self.xGeometry)
         self.yGeometry = 580
 
         self.buttonLoadImage = ttk.Button(self, text = "Load image", command = self.buttonSetPathToImage)

@@ -16,7 +16,7 @@ def main():
     GUI.updateText("CHOOS img")
     GUI.update()
 
-    imageProcess.k=4 ## Odskusane velkosti filtra kde k=1;2;4
+    imageProcess.k=1 ## Odskusane velkosti filtra kde k=1;2;4
     imageProcess.slowGauss==False  ## Rychlejsi vypocet gaussiana pomalsi sa zachoval v kode pre porovnanie rychlosti 
 
 
@@ -33,11 +33,10 @@ def main():
         if imageProcess.filepathExist: 
             GUI.updateText("Image is loaded") 
             GUI.update()
-            GUI.pictureHight,GUI.pictureWidth,imageConverted=imageProcess.imgConvert()
+            imageConverted=imageProcess.imgConvert()
             pathIsSaved= TRUE
             imageProcess.filepathExist=False
             GUI.update()
-            #GUI.picture.configure(image=imageConverted)
             GUI.imageIsprocesed=imageProcess.getFalgImageisProcesed()
 
 
