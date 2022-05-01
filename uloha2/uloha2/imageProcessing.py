@@ -63,10 +63,15 @@ class ImgProc():
         ## Vytvorime prazdny image
         outputImage=numpy.zeros((newImageHeight, newImageWidth))
 
+        irange=imageHeight-K-1
+        jrange=imageWidth-K-1
+
         ## Aplikovanie konvolucie
-        for i in range(K,imageHeight-K-1):
-            for j in range(K,imageWidth-K-1):
-                outputImage[i-K,j-K]=self.matrixMultiply(inputImage[i-K:i+1+K,j-K:j+1+K],mask)
+        for i in range(K,irange):
+            imageIrange=i+1+K
+            for j in range(K,jrange):
+                imageJrange=j+1+K
+                outputImage[i-K,j-K]=self.matrixMultiply(inputImage[i-K:imageIrange,j-K:imageJrange],mask)
 
         outputImage= outputImage/numpy.max(outputImage)
         
@@ -172,6 +177,7 @@ class ImgProc():
         return mask
 
     def matrixMultiply(self,imageMatrix,filterMatrix):
+        
         img_height,img_width = imageMatrix.shape
 
         outputSUM=0
