@@ -31,6 +31,7 @@ class ImgProc():
         self.slowGauss=False
         self.GaussFilter=[]
         self.LoGFilter=[]
+        self.lImage = []
 
 
     def loadTESTimage(self):
@@ -83,7 +84,6 @@ class ImgProc():
             L0 = cv2.Laplacian(G0, ddepth=cv2.CV_16S, ksize=size)
             L0=L0/numpy.max(L0)
             cv2.imshow("Ukazkove",L0)
-            cv2.waitKey(0)
 
     def preprocessIMG(self,img):
         img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -109,13 +109,13 @@ class ImgProc():
         sigmaOn2=sigma**2
 
         ## exponent
-        h=(numpy.exp(-(maskMatrixOn2 + maskMatrixTOn2)/(2*sigmaOn2)))
+        exp=(numpy.exp(-(maskMatrixOn2 + maskMatrixTOn2)/(2*sigmaOn2)))
 
-        h=h*(maskMatrixOn2 +maskMatrixTOn2-2*sigmaOn2)/(2*pi*sigma**6)
+        maskLap=-(1/(pi*sigma**4))*(1-(maskMatrixOn2 + maskMatrixTOn2)/(2*sigmaOn2))*exp
 
-        #lap.Filter
-        laplacianFilter=h-numpy.sum(h)/(size**2)
-        # len zapisanie do glob. premennej pre vykreslenie grafu
+        ## pouzity vzorec https://homepages.inf.ed.ac.uk/rbf/HIPR2/log.htm
+
+        laplacianFilter=maskLap-numpy.sum(maskLap)/(size**2)
         self.LoGFilter=laplacianFilter
 
         return laplacianFilter
@@ -249,23 +249,53 @@ class ImgProc():
 
             gImage_grey=self.GAUSS(self.loadedImage)
 
-
+            
             ## laplacian
             print("lap")
-            lImage=self.LAPLACIAN(gImage_grey)
+            self.lImage=self.LAPLACIAN(gImage_grey)
 
-            
+                    
             print("end")
             
 
-            cv2.imshow("LoG",lImage)
+            cv2.imshow("LoG",self.lImage)
 
             self.imageIsprocesedFlag=TRUE
             
 
-            self.convertImage(lImage)
+            self.convertImage(self.lImage)
             
             return self.imgtk
+
+    def zero_cross_detection(self,inImage):
+
+        ZC_img = numpy.zeros(inImage.shape)
+
+        imageHeight = inImage.shape[0]
+        imageWidth = inImage.shape[1]
+
+        for i in range(1,imageHeight):
+            for j in range(1,imageWidth):
+                if inImage[i][j]>0:
+                    if inImage[i+1][j] < 0:
+                        ZC_img[i,j] = 1
+                    elif inImage[i+1][j+1] < 0:
+                        ZC_img[i,j] = 1
+                    elif inImage[i][j+1] < 0:
+                        ZC_img[i,j] = 1
+                    elif inImage[i-1][j] < 0:
+                        ZC_img[i,j] = 1
+                elif inImage[i][j] < 0:
+                    if inImage[i+1][j] > 0:
+                        ZC_img[i,j] = 0
+                    elif inImage[i+1][j+1] > 0:
+                        ZC_img[i,j] = 0
+                    elif inImage[i][j+1] > 0:
+                        ZC_img[i,j] = 0
+                    elif inImage[i-1][j] > 0:
+                        ZC_img[i,j] = 0
+
+        return ZC_img
             
     def showLoadedImage(self):
         cv2.imshow("Loaded Image",self.loadedImage)
@@ -273,21 +303,9 @@ class ImgProc():
     def showGaussImageImage(self):
         cv2.imshow("Gauss",self.gImage)
 
-    def showLaplacianOriginalImage(self):
-
-        _,size,sigma =self.variables()
-          
-        v = numpy.array(range(-int(numpy.floor(size/2)), int(numpy.ceil(size/2))))
-        
-        maskMatrix = numpy.ones((size,1))*v
-        maskMatrixT = maskMatrix.T
-
-        maskMatrixOn2=maskMatrix**2
-        maskMatrixTOn2=maskMatrixT**2
-
-        image_grey=self.preprocessIMG(self.loadedImage)
-        self.lImageOrig=self.LAPLACIAN(image_grey,maskMatrixOn2,maskMatrixTOn2)
-        cv2.imshow("Laplacian",self.lImageOrig)
+    def showZCImage(self):        
+        img=self.zero_cross_detection(self.lImage)
+        cv2.imshow("Z-C_image",img)
     
     def getFalgImageisProcesed(self):
         return self.imageIsprocesedFlag

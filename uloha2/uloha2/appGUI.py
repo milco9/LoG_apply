@@ -73,7 +73,7 @@ class App(tkinter.Tk):
         self.buttonshowGauss = ttk.Button(self, text = "Gauss image", command = self.buttonGaussImage)
         self.buttonshowGauss.place(x=xShiftWidgets,y=231)
 
-        self.buttonshowLaplacian = ttk.Button(self, text = "Lapla. image", command = self.buttonLaplacianImage)
+        self.buttonshowLaplacian = ttk.Button(self, text = "Z-C image", command = self.buttonLaplacianImage)
         self.buttonshowLaplacian.place(x=xShiftWidgets,y=291)
 
         self.buttonShowLoadedImage = ttk.Button(self, text = "Loaded image", command = self.buttonLoadedTestImage)

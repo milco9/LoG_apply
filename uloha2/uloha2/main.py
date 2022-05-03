@@ -16,7 +16,7 @@ def main():
     GUI.updateText("CHOOS img")
     GUI.update()
 
-    imageProcess.k=4 ## Odskusane velkosti filtra kde k=1;2;4
+    imageProcess.k=1 ## Odskusane velkosti filtra kde k=1;2;4
     imageProcess.slowGauss==False  ## Rychlejsi vypocet gaussiana pomalsi sa zachoval v kode pre porovnanie rychlosti 
 
 
@@ -45,7 +45,7 @@ def main():
                 GUI.updateText("LAP show")
                 GUI.loadLaplacianimageFlag=FALSE
                 GUI.update()
-                imageProcess.showLaplacianOriginalImage()
+                imageProcess.showZCImage()
             else:
                 GUI.updateText("LOAD PICTUE !")
                 GUI.loadLaplacianimageFlag=FALSE
@@ -90,12 +90,12 @@ def main():
             if pathIsSaved:
                 GUI.updateText("Orig. LoG")
                 print("volam")
-                GUI.logImageFlag=FALSE
+                GUI.logImageFlag=False
                 GUI.update()
                 imageProcess.getLOGpythonfunctions()
             else:
                 GUI.updateText("LOAD PICTUE !")
-                GUI.logImageFlag=FALSE
+                GUI.logImageFlag=False
                 GUI.update()
 
 
