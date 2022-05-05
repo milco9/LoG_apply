@@ -9,10 +9,6 @@ from tkinter import filedialog
 import os
 
 
-
-
-
-
 class ImgProc():
 
 
@@ -28,7 +24,6 @@ class ImgProc():
         self.firstGauss=TRUE
         self.firstLap=TRUE
         self.k=1     ## Odskusane velkosti filtra kde k=1;2;4
-        self.slowGauss=False
         self.GaussFilter=[]
         self.LoGFilter=[]
         self.lImage = []
@@ -68,6 +63,7 @@ class ImgProc():
         jrange=imageWidth-K-1
 
         ## Aplikovanie konvolucie
+        ## Prechadzame obrazok pricom sa vzdy vytiahne z obrazka taka ista velkost aky je velky filter a tieto dve casti tj vytiahnuta cast z obrazka vo forme matice a maska a posielaju sa do funkcie matrixMultiply.
         for i in range(K,irange):
             imageIrange=i+1+K
             for j in range(K,jrange):
@@ -78,8 +74,24 @@ class ImgProc():
         
         return outputImage
 
-    def pythonFunctionLoG(self,img,size,sigma):
+    def matrixMultiply(self,imageMatrix,filterMatrix):
+        
+        img_height,img_width = imageMatrix.shape
 
+        outputSUM=0
+        outputMatrix=numpy.zeros((img_height, img_width))
+
+        ## nasledne v tejtu funkcii aplikujeme masku/filter na vytiahnutu maticu z obrazka pomocou dvoch forov kde sa vlastne nasoba jednotlive elementy oboch matic 
+        ## a v celkovej sume posielaju naspat do obrazka 
+        for i in range (len(imageMatrix)):
+            for j in range (len(filterMatrix)):
+                    outputMatrix[i][j]= imageMatrix[i][j]*filterMatrix[i][j]
+                    outputSUM +=outputMatrix[i][j]
+        
+        return outputSUM
+
+    def pythonFunctionLoG(self,img,size,sigma):
+            ## tato funkcia nam len preukauje pouzitie ukazkovych funkcii dany obrazok sa nikde neposiela iba sa rovno vykresli do okna "Ukazkove"
             G0=cv2.GaussianBlur(img,(size,size),sigma)
             L0 = cv2.Laplacian(G0, ddepth=cv2.CV_16S, ksize=size)
             L0=L0/numpy.max(L0)
@@ -90,7 +102,7 @@ class ImgProc():
         return img
 
     def createFilter(self):
-
+            ## v tejto funkcii vytvorime LoG masku
         _,size,sigma =self.variables()
 
         # Vytvori sa vektor -1 0 1
@@ -122,13 +134,13 @@ class ImgProc():
 
     def LAPLACIAN(self,img):
 
-                ## taktiez najskor si vytvorime filter
+            ## taktiez najskor si vytvorime filter/maska
             laplacianFilter=self.createFilter()
 
             if self.firstLap is TRUE:
                 print(laplacianFilter)
                 self.firstLap=FALSE
-
+            ## aplikovanie konvolucie 
             laplacian = self.con(img,laplacianFilter)
 
             
@@ -137,23 +149,16 @@ class ImgProc():
 
     def GAUSS(self,img):
 
-        if self.slowGauss:
-            B,G,R = cv2.split(img)
-            img_GB = self.slowGausCONV(B)
-            img_GG = self.slowGausCONV(G)
-            img_GR = self.slowGausCONV(R)
-            img = cv2.merge([img_GB,img_GG,img_GR])
-            img=self.preprocessIMG(img)
-        else :
-            #img = self.fastGaussCONV(img)
+        ## vytvorenie masku
+        mask = self.createMaskForGauss()
+        if self.firstGauss is TRUE:
+            print(mask)
+            self.firstGauss=FALSE
 
-            mask = self.createMaskForGauss()
-            if self.firstGauss is TRUE:
-                print(mask)
-                self.firstGauss=FALSE
-
-            img=self.preprocessIMG(img)
-            img = self.con(img,mask)
+        img=self.preprocessIMG(img)
+        ## aplikovanie konvolucie na obrazok 
+        img = self.con(img,mask)
+         
 
         ## Zapisanie do globalnej premennej na zobrazenie gauusiana
         self.gImage=img
@@ -161,67 +166,25 @@ class ImgProc():
         return img
 
     def createMaskForGauss(self):
-
+            ## v tejto zase vytvorima masku gauss filtra
         k,size,sigma =self.variables()
+
+        sigmaOn2=sigma**2
 
         pi=numpy.pi
         mask = numpy.zeros((size,size),numpy.float32)
         for i in range (size):
             for j in range (size):
-                n = -((i-k)**2 + (j-k)**2)
-                mask[i,j] = m.exp(n/(2*(sigma**2)))/2*pi*(sigma**2)
+                ikOn2=(i-k)**2
+                jkOn2=(j-k)**2
+                n = -(ikOn2 + jkOn2)
+                mask[i,j] = m.exp(n/(2*sigmaOn2))/2*pi*sigmaOn2
+
         mask= mask/(numpy.sum(mask)) 
 
         self.GaussFilter=mask
 
-        return mask
-
-    def matrixMultiply(self,imageMatrix,filterMatrix):
-        
-        img_height,img_width = imageMatrix.shape
-
-        outputSUM=0
-        outputMatrix=numpy.zeros((img_height, img_width))
-
-
-        for i in range (len(imageMatrix)):
-            for j in range (len(filterMatrix)):
-                    outputMatrix[i][j]= imageMatrix[i][j]*filterMatrix[i][j]
-                    outputSUM +=outputMatrix[i][j]
-        
-        return outputSUM
-                
-
-
-    def slowGausCONV(self,img_gray):
-
-        ## Naciatanie premennych o filtri
-        k,_,_ =self.variables()
-
-        ## Vytvorenie filtra
-        kernel = self.createMaskForGauss()
-
-        if self.firstGauss is TRUE:
-            print(kernel)
-            self.firstGauss=FALSE
-
-        height,width = img_gray.shape
-        kernel_height,_ = kernel.shape
-        
-        halfKernelHeight = (int(kernel_height/2))
-
-        rowRange =(halfKernelHeight,height-halfKernelHeight)
-        colRange =(halfKernelHeight,width-halfKernelHeight)
-
-                ## Aplikovanie filtra na obrazok kde sa spravy konvolucia tj vynasobi sa filter kazdym pixelom a nahradi sa suma v obrazku na danych indexoch
-        for i in range(rowRange[1]):
-            for j in range(colRange[1]):
-                sum = 0
-                for k in range(0,kernel_height):
-                    for r in range(0,kernel_height):
-                        sum += img_gray[i-halfKernelHeight+k,j-halfKernelHeight+r]*kernel[k,r]
-                img_gray[i,j] = sum
-        return img_gray
+        return mask                
 
     def variables(self):  
         k=self.k

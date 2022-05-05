@@ -17,7 +17,6 @@ def main():
     GUI.update()
 
     imageProcess.k=1 ## Odskusane velkosti filtra kde k=1;2;4
-    imageProcess.slowGauss==False  ## Rychlejsi vypocet gaussiana pomalsi sa zachoval v kode pre porovnanie rychlosti 
 
 
     while True:
@@ -42,7 +41,7 @@ def main():
 
         if GUI.loadLaplacianimageFlag:
             if pathIsSaved: 
-                GUI.updateText("LAP show")
+                GUI.updateText("Z-C show")
                 GUI.loadLaplacianimageFlag=FALSE
                 GUI.update()
                 imageProcess.showZCImage()
@@ -76,12 +75,12 @@ def main():
 
         if GUI.GraphFlag:
             if pathIsSaved: 
-                GUI.GraphFlag=FALSE
+                GUI.GraphFlag=False
                 GUI.update()
                 imageProcess.showFIlterGraph()
             else:
                 GUI.updateText("LOAD PICTUE !")
-                GUI.GraphFlag=FALSE
+                GUI.GraphFlag=False
                 GUI.update()
     
 
@@ -100,6 +99,7 @@ def main():
 
 
         if GUI.closeFlag:
+            matplotlib.pyplot.close('all')
             GUI.destroy()
             
             break
@@ -109,7 +109,7 @@ def main():
         
 
     cv2.destroyAllWindows()
-    matplotlib.pyplot.close('all')
+    
 
 
 if __name__ == "__main__":
